@@ -2,6 +2,8 @@ package com.example.MppToWeb.model;
 
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "tasks")
@@ -36,6 +38,24 @@ public class Task {
 
     @Column(name = "resources")
     private String resources;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Task parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private Set<Task> subtasks = new HashSet<>();
+
+    @Column(name = "outline_level")
+    private Integer outlineLevel;
+
+    @Column(name = "outline_number")
+    private String outlineNumber;
+
+    // Default constructor
+    public Task() {
+        this.subtasks = new HashSet<>();
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -116,5 +136,49 @@ public class Task {
 
     public void setResources(String resources) {
         this.resources = resources;
+    }
+
+    public Task getParent() {
+        return parent;
+    }
+
+    public void setParent(Task parent) {
+        this.parent = parent;
+    }
+
+    public Set<Task> getSubtasks() {
+        return subtasks;
+    }
+
+    public void setSubtasks(Set<Task> subtasks) {
+        this.subtasks = subtasks;
+    }
+
+    public Integer getOutlineLevel() {
+        return outlineLevel;
+    }
+
+    public void setOutlineLevel(Integer outlineLevel) {
+        this.outlineLevel = outlineLevel;
+    }
+
+    public String getOutlineNumber() {
+        return outlineNumber;
+    }
+
+    public void setOutlineNumber(String outlineNumber) {
+        this.outlineNumber = outlineNumber;
+    }
+
+    // Helper method to add a subtask
+    public void addSubtask(Task subtask) {
+        subtasks.add(subtask);
+        subtask.setParent(this);
+    }
+
+    // Helper method to remove a subtask
+    public void removeSubtask(Task subtask) {
+        subtasks.remove(subtask);
+        subtask.setParent(null);
     }
 }
